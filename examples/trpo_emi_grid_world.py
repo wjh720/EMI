@@ -289,7 +289,7 @@ def main(_):
 	embedding_dim = args.embedding_dim
 
 	model_args = dict(
-		state_network_cls=ConvNetwork,
+		state_network_cls=MLP,
 		state_network_args=get_state_embedding_network_args(env, embedding_dim),
 		action_network_cls=MLP,
 		action_network_args=get_action_embedding_network_args(env, embedding_dim),
@@ -297,7 +297,7 @@ def main(_):
 	)
 
 	embeding_optimizer = FirstOrderOptimizer
-	embeding_optimizer_args = dict(max_epochs=args.embedding_opt_max_itr, batch_size=512, num_slices=1,
+	embeding_optimizer_args = dict(max_epochs=args.embedding_opt_max_itr, batch_size=2048, num_slices=1,
 								   ignore_last=True, learning_rate=args.embedding_adam_learning_rate,
 								   verbose=True)
 
