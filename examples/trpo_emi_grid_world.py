@@ -80,17 +80,11 @@ args = parser.parse_args()
 
 
 def get_value_network(env):
-	value_network = ConvNetwork(
+	value_network = MLP(
 		name='value_network',
 		input_shape=env.observation_space.shape,
 		output_dim=1,
-		# number of channels/filters for each conv layer
-		conv_filters=(16, 32),
-		# filter size
-		conv_filter_sizes=(8, 4),
-		conv_strides=(4, 2),
-		conv_pads=('VALID', 'VALID'),
-		hidden_sizes=(256,),
+		hidden_sizes=(32,),
 		hidden_nonlinearity=tf.nn.relu,
 		output_nonlinearity=None,
 		batch_normalization=False,
@@ -99,17 +93,11 @@ def get_value_network(env):
 
 
 def get_policy_network(env):
-	policy_network = ConvNetwork(
-		name='prob_network',
+	policy_network = MLP(
+		name='mean_network',
 		input_shape=env.observation_space.shape,
-		output_dim=env.action_space.n,
-		# number of channels/filters for each conv layer
-		conv_filters=(16, 32),
-		# filter size
-		conv_filter_sizes=(8, 4),
-		conv_strides=(4, 2),
-		conv_pads=('VALID', 'VALID'),
-		hidden_sizes=(256,),
+		output_dim=env.action_space.flat_dim,
+		hidden_sizes=(32,),
 		hidden_nonlinearity=tf.nn.relu,
 		output_nonlinearity=tf.nn.softmax,
 		batch_normalization=False,
