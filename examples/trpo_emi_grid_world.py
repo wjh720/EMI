@@ -128,8 +128,8 @@ def get_baseline(env, value_function, num_slices):
 			)
 		elif (value_function == 'adam'):
 			baseline_optimizer = FirstOrderOptimizer(
-				max_epochs=3,
-				batch_size=512,
+				max_epochs=5,
+				batch_size=64,
 				num_slices=num_slices,
 				ignore_last=True,
 				# verbose=True
@@ -156,11 +156,7 @@ def get_state_embedding_network_args(env, embedding_dim):
 		name='state_embedding_network',
 		input_shape=env.observation_space.shape,
 		output_dim=embedding_dim,
-		conv_filters=(16, 32),
-		conv_filter_sizes=(8, 4),
-		conv_strides=(4, 2),
-		conv_pads=('VALID', 'VALID'),
-		hidden_sizes=(256,),
+		hidden_sizes=(64, 32),
 		hidden_nonlinearity=tf.nn.relu,
 		output_nonlinearity=None,
 		batch_normalization=False,
@@ -200,12 +196,7 @@ def get_reconciler_state_network_args(env, embedding_dim):
 		name='reconciler_state_network',
 		# input_shape=env.observation_space.shape,
 		output_dim=None,
-		conv_filters=(16, 32),
-		conv_filter_sizes=(8, 4),
-		conv_strides=(4, 2),
-		conv_pads=('VALID', 'VALID'),
-		# hidden_sizes=(256,),
-		hidden_sizes=(),
+		hidden_sizes=(64, 32),
 		hidden_nonlinearity=tf.nn.relu,
 		output_nonlinearity=None,
 		batch_normalization=False,
@@ -299,7 +290,7 @@ def main(_):
 			common_network_cls=MLP,
 			common_network_args=get_reconciler_common_network_args(env, embedding_dim),
 		)
-		model_args['reconciler_args']['state_network_cls'] = ConvNetwork
+		model_args['reconciler_args']['state_network_cls'] = MLP
 		model_args['reconciler_args']['state_network_args'] = get_reconciler_state_network_args(env, embedding_dim)
 		model_args['reconciler_args']['action_network_cls'] = MLP
 		model_args['reconciler_args']['action_network_args'] = get_reconciler_action_network_args(env, embedding_dim)
@@ -347,7 +338,7 @@ def main(_):
 		env_spec=env.spec,
 		min_batch_size=args.batch_size,
 
-		use_only_last_frame=True,
+		use_only_last_frame=False,
 
 		replay_pool_args=dict(
 			max_size=replay_pool_size,
