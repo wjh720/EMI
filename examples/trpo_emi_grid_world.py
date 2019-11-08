@@ -5,7 +5,6 @@ import sys
 sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..'))
 
 from rllab.baselines.zero_baseline import ZeroBaseline
-from rllab.envs.atari.atari_env import AtariEnv
 from rllab.envs.grid_world.grid_world_env import Grid_World_Env
 
 import sandbox.rocky.tf.core.layers as L
@@ -15,7 +14,6 @@ from sandbox.rocky.tf.optimizers.first_order_optimizer import FirstOrderOptimize
 from sandbox.rocky.tf.optimizers.lbfgs_optimizer import LbfgsOptimizer
 
 from sandbox.rocky.tf.baselines.deterministic_mlp_baseline import DeterministicMLPBaseline
-from sandbox.rocky.tf.core.network import ConvNetwork
 from sandbox.rocky.tf.core.network import MLP
 from sandbox.rocky.tf.envs.base import TfEnv
 from sandbox.rocky.tf.policies.categorical_mlp_policy import CategoricalMLPPolicy
