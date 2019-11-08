@@ -97,7 +97,7 @@ def get_policy_network(env):
 		name='mean_network',
 		input_shape=env.observation_space.shape,
 		output_dim=env.action_space.flat_dim,
-		hidden_sizes=(32,),
+		hidden_sizes=(64, 32),
 		hidden_nonlinearity=tf.nn.relu,
 		output_nonlinearity=tf.nn.softmax,
 		batch_normalization=False,
