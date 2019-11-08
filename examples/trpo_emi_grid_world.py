@@ -35,12 +35,12 @@ parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFo
 parser.add_argument('--seed', help='RNG seed', type=int, default=2)
 parser.add_argument('--n_cpu', type=int, default=int(16))
 parser.add_argument('--num_slices', help='Slice big batch into smaller ones to prevent OOM', type=int,
-					default=int(16))
+                    default=int(16))
 parser.add_argument('--debug', help='debug mode', action='store_true')
 parser.add_argument('--log_dir', help='log directory', default=None)
 parser.add_argument('--value_function', help='Choose value function baseline',
-					choices=['zero', 'conj', 'adam', 'linear'],
-					default='adam')
+                    choices=['zero', 'conj', 'adam', 'linear'],
+                    default='adam')
 
 parser.add_argument('--n_parallel', type=int, default=int(16))
 parser.add_argument('--env', help='environment ID', default='MontezumaRevengeNoFrameskip-v4')
@@ -298,8 +298,8 @@ def main(_):
 
 	embeding_optimizer = FirstOrderOptimizer
 	embeding_optimizer_args = dict(max_epochs=args.embedding_opt_max_itr, batch_size=2048, num_slices=1,
-								   ignore_last=True, learning_rate=args.embedding_adam_learning_rate,
-								   verbose=True)
+	                               ignore_last=True, learning_rate=args.embedding_adam_learning_rate,
+	                               verbose=True)
 
 	replay_pool_size = None
 	if (args.replay_pool_size is not None and args.replay_pool_size > 0):
@@ -345,8 +345,8 @@ def main(_):
 			)
 
 	config = tf.ConfigProto(allow_soft_placement=True,
-							intra_op_parallelism_threads=args.n_cpu,
-							inter_op_parallelism_threads=args.n_cpu)
+	                        intra_op_parallelism_threads=args.n_cpu,
+	                        inter_op_parallelism_threads=args.n_cpu)
 	config.gpu_options.allow_growth = True  # pylint: disable=E1101
 	sess = tf.Session(config=config)
 	# with sess.as_default():
@@ -399,7 +399,7 @@ def main(_):
 		step_size=args.step_size,
 		clip_reward=(not args.reward_no_scale),
 		optimizer_args={"subsample_factor": 1.0,
-						"num_slices": args.num_slices},
+		                "num_slices": args.num_slices},
 		dsae=dsae,
 	)
 	algo.train(sess)
