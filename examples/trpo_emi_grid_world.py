@@ -6,10 +6,7 @@ sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..'))
 
 from rllab.baselines.zero_baseline import ZeroBaseline
 from rllab.envs.atari.atari_env import AtariEnv
-from rllab.envs.grid_world.pass_environment import Pass
-from rllab.envs.grid_world.island_environment import Island
-from rllab.envs.grid_world.pushball_environment import PushBall
-from rllab.envs.grid_world.x_island_environment import x_Island
+from rllab.envs.grid_world.grid_world_env import Grid_World_Env
 
 import sandbox.rocky.tf.core.layers as L
 from sandbox.rocky.tf.baselines.gaussian_mlp_baseline import GaussianMLPBaseline
@@ -280,7 +277,7 @@ def main(_):
 
 	check_environment()
 
-	env = TfEnv(AtariEnv(
+	env = TfEnv(Grid_World_Env(
 		args.env, force_reset=True, record_video=False, record_log=False, resize_size=args.resize_size,
 		atari_noop=args.atari_noop, atari_eplife=args.atari_eplife, atari_firereset=args.atari_firereset,
 		save_original_frames=False,
