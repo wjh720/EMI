@@ -3,6 +3,7 @@ import numpy as np
 import copy
 from rllab.spaces import Discrete
 from rllab.spaces import Box
+import random
 
 
 class Pass:
@@ -25,6 +26,10 @@ class Pass:
         return res
 
     def initialization(self, args):
+
+        self.seed = random.randint(0, 9999)
+        np.random.seed(self.seed)
+
         self.is_print = self.rank == 0
 
         self.args = args

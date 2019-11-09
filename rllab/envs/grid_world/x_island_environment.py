@@ -2,6 +2,7 @@ import numpy as np
 import copy
 from rllab.spaces import Discrete
 from rllab.spaces import Box
+import random
 
 
 class x_Island:
@@ -25,6 +26,10 @@ class x_Island:
 		return res
 
 	def initialization(self, args):
+
+		self.seed = random.randint(0, 9999)
+		np.random.seed(self.seed)
+		
 		self.is_print = self.rank == 0
 		self.n_agent = args.n_agent
 		self.n_action = 6
