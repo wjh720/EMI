@@ -37,7 +37,7 @@ def get_venv(args, env_id, num_env, seed):
 	return venv
 
 
-class AtariEnv(Env, Serializable):
+class Grid_World_Env(Env, Serializable):
 	def __init__(self, env_name, resize_size=52, atari_noop=True, atari_eplife=False, atari_firereset=False,
 	             record_video=True, video_schedule=None, log_dir=None, record_log=True,
 	             force_reset=False, save_original_frames=False):

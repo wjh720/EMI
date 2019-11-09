@@ -10,6 +10,19 @@ class x_Island:
 		self.rank = rank
 		self.initialization(args)
 
+	def get_discrete(self, shape):
+		size = 1
+		for item in shape:
+			size *= item
+		return gym.spaces.Discrete(size)
+
+	def get_action_n(self, action_n):
+		res = []
+		for item in self.action_space_x:
+			res.append(action_n % item)
+			action_n /= item
+		return res
+
 	def initialization(self, args):
 		self.is_print = self.rank == 0
 		self.n_agent = args.n_agent
@@ -98,7 +111,8 @@ class x_Island:
 		self.agent_score = [[0. for _ in range(self.n_agent)] for _ in range(self.n_wolf)]
 
 		# Used by OpenAI baselines
-		self.action_space = gym.spaces.MultiDiscrete([self.n_action, self.n_action, self.n_action, self.n_action])
+		self.action_space_x = [self.n_action, self.n_action, self.n_action, self.n_action]
+		self.action_space = self.get_discrete(self.action_space_x)
 		self.observation_space = gym.spaces.Box(low=-1, high=1,
 		                                        shape=[(args.size * 2 + self.agent_max_power) * self.n_agent +
 		                                               (args.size * 2) * self.n_wolf +
@@ -152,6 +166,8 @@ class x_Island:
 		return wolf
 
 	def step(self, action_n):
+
+		action_n = self.get_action_n(action_n)
 
 		if self.t_step % self.wolf_recover_time == 0:
 			for i in range(self.n_wolf):

@@ -11,6 +11,19 @@ class PushBall:
 		self.rank = rank
 		self.initialization(args)
 
+	def get_discrete(self, shape):
+		size = 1
+		for item in shape:
+			size *= item
+		return gym.spaces.Discrete(size)
+
+	def get_action_n(self, action_n):
+		res = []
+		for item in self.action_space_x:
+			res.append(action_n % item)
+			action_n /= item
+		return res
+
 	def random_start(self):
 		# return np.array([self.size // 2, self.size // 2])
 		# return np.array(np.random.randint(self.size // 4, self.size // 4 * 3, [self.n_dim]))
@@ -63,7 +76,8 @@ class PushBall:
 		self.flag = np.eye(2)
 
 		# Used by OpenAI baselines
-		self.action_space = gym.spaces.MultiDiscrete([self.n_action, self.n_action])
+		self.action_space_x = [self.n_action, self.n_action]
+		self.action_space = self.get_discrete(self.action_space_x)
 		self.observation_space = gym.spaces.Box(low=-1, high=1, shape=[args.size * 2 * self.n_agent +
 		                                                               args.size * 2 * self.n_ball])
 		self.num_envs = args.num_env
@@ -74,6 +88,8 @@ class PushBall:
 		self.t_step = 0
 
 	def step(self, action_n):
+
+		action_n = self.get_action_n(action_n)
 
 		self.t_step += 1
 
