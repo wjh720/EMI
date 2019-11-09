@@ -38,9 +38,9 @@ def get_venv(args, env_id, num_env, seed):
 
 
 class Grid_World_Env(Env, Serializable):
-	def __init__(self, env_name, resize_size=52, atari_noop=True, atari_eplife=False, atari_firereset=False,
-	             record_video=True, video_schedule=None, log_dir=None, record_log=True,
-	             force_reset=False, save_original_frames=False):
+
+	
+	def __init__(self, env_name):
 		if log_dir is None:
 			if logger.get_snapshot_dir() is None:
 				logger.log("Warning: skipping Gym environment monitoring since snapshot_dir not configured.")
