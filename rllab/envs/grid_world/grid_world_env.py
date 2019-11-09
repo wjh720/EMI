@@ -49,7 +49,7 @@ class Grid_World_Env(Env, Serializable):
 		logger.log("observation space: {}".format(self._observation_space))
 		self._action_space = convert_gym_space(env.action_space)
 		logger.log("action space: {}".format(self._action_space))
-		self._horizon = env.spec.tags['wrapper_config.TimeLimit.max_episode_steps']
+		self._horizon = env.spec['length']
 
 	@property
 	def observation_space(self):
