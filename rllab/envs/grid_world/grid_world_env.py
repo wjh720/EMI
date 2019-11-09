@@ -21,6 +21,8 @@ from rllab.envs.grid_world.pushball_environment import PushBall
 from rllab.envs.grid_world.x_island_environment import x_Island
 
 from rllab.envs.atari.atari_wrappers import wrap_deepmind, make_atari, get_wrapper_of_specific_type, FrameSaver
+
+
 def get_venv(args, env_id, num_env, seed):
 	env_type = args.env
 	if env_type == 'pass':
@@ -34,9 +36,11 @@ def get_venv(args, env_id, num_env, seed):
 	venv = TfEnv(env)
 	return venv
 
+
 class AtariEnv(Env, Serializable):
-	def __init__(self, env_name, resize_size=52, atari_noop=True, atari_eplife=False, atari_firereset=False, record_video=True, video_schedule=None, log_dir=None, record_log=True,
-				 force_reset=False, save_original_frames=False):
+	def __init__(self, env_name, resize_size=52, atari_noop=True, atari_eplife=False, atari_firereset=False,
+	             record_video=True, video_schedule=None, log_dir=None, record_log=True,
+	             force_reset=False, save_original_frames=False):
 		if log_dir is None:
 			if logger.get_snapshot_dir() is None:
 				logger.log("Warning: skipping Gym environment monitoring since snapshot_dir not configured.")
@@ -46,7 +50,8 @@ class AtariEnv(Env, Serializable):
 
 		env = make_atari(env_name, noop=atari_noop)
 
-		env = wrap_deepmind(env=env, resize=resize_size, episode_life=atari_eplife, fire_reset=atari_firereset, save_original_frames=save_original_frames)
+		env = wrap_deepmind(env=env, resize=resize_size, episode_life=atari_eplife, fire_reset=atari_firereset,
+		                    save_original_frames=save_original_frames)
 		logger.log("resize size: %d" % resize_size)
 
 		self.save_original_frames = save_original_frames
@@ -122,4 +127,3 @@ class AtariEnv(Env, Serializable):
 		if not self.save_original_frames:
 			return None
 		return self.original_frame_saver.get_frames()
-
