@@ -56,7 +56,11 @@ parser.add_argument('--residual_method', type=str, default='euclidean')
 
 parser.add_argument('--reconciler_loss_weight', type=float, default=1e4)
 
-parser.add_argument('--residual_ir_coeff', type=float, default=1e-3)
+parser.add_argument('--diversity_ir_coeff', type=float, default=1e-1)
+parser.add_argument('--diversity_kernel_bandwidth', type=float, default=5.0)
+parser.add_argument('--diversity_seeking_pool', type=str, default='replay_pool')
+
+parser.add_argument('--residual_ir_coeff', type=float, default=None)
 parser.add_argument('--residual_error_ir_normalize', action='store_true')
 parser.add_argument('--residual_error_ir_calc_after_opt', action='store_true')
 parser.add_argument('--residual_error_ir_use_unnormalized_errors', action='store_true')
@@ -399,6 +403,11 @@ def main(_):
 
 		reconciler_loss_weight=args.reconciler_loss_weight,
 
+		diversity_seeking_ir_weight=args.diversity_ir_coeff,
+		diversity_seeking_kernel_bandwidth=args.diversity_kernel_bandwidth,
+		diversity_seeking_calc='relative',
+		diversity_seeking_pool=args.diversity_seeking_pool,
+
 		residual_error_ir_weight=args.residual_ir_coeff,
 		residual_error_ir_normalize=args.residual_error_ir_normalize,
 		residual_error_ir_calc_after_opt=args.residual_error_ir_calc_after_opt,
@@ -423,7 +432,7 @@ def main(_):
 		n_itr=args.n_itr,
 		discount=args.discount_factor,
 		step_size=args.step_size,
-		clip_reward=(not args.reward_no_scale),
+		clip_reward=False,
 		optimizer_args={"subsample_factor": 1.0,
 		                "num_slices": args.num_slices},
 		dsae=dsae,
