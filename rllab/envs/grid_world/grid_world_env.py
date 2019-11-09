@@ -44,7 +44,6 @@ class Grid_World_Env(Env, Serializable):
 
 		env = get_venv(args)
 		self.env = env
-		self.env_id = env.spec.id
 
 		self._observation_space = convert_gym_space(env.observation_space)
 		logger.log("observation space: {}".format(self._observation_space))

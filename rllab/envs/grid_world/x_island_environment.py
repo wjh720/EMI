@@ -122,7 +122,7 @@ class x_Island:
 		self.num_envs = args.num_env
 		self.metadata = {'render.modes': []}
 		self.reward_range = (-200., 20000.)
-		self.spec = self.n_agent
+		self.spec = {'length': self.args.episode_length}
 
 		self.t_step = 0
 		self.agent_power_zeros_like = np.zeros_like(self.agent_power)
