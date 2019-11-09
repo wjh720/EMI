@@ -58,7 +58,7 @@ parser.add_argument('--embedding_dim', type=int, default=int(2))
 parser.add_argument('--embedding_opt_max_itr', type=int, default=int(3))
 parser.add_argument('--actions_unit_gaussian_kl_minimization_loss_weight', type=float, default=5e-1)
 parser.add_argument('--replay_pool_size', type=int, default=0)
-parser.add_argument('--replay_pool_strategy', type=str, default='subsampled_batch')
+parser.add_argument('--replay_pool_strategy', type=str, default='fifo')
 parser.add_argument('--residual_method', type=str, default='euclidean')
 
 parser.add_argument('--reconciler_loss_weight', type=float, default=1e2)
