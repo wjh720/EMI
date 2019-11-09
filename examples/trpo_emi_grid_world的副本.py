@@ -5,7 +5,8 @@ import sys
 sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..'))
 
 from rllab.baselines.zero_baseline import ZeroBaseline
-from rllab.envs.grid_world.grid_world_env import Grid_World_Env
+from rllab.baselines.linear_feature_baseline import LinearFeatureBaseline
+from rllab.envs.normalized_env import normalize
 
 import sandbox.rocky.tf.core.layers as L
 from sandbox.rocky.tf.baselines.gaussian_mlp_baseline import GaussianMLPBaseline
@@ -16,7 +17,7 @@ from sandbox.rocky.tf.optimizers.lbfgs_optimizer import LbfgsOptimizer
 from sandbox.rocky.tf.baselines.deterministic_mlp_baseline import DeterministicMLPBaseline
 from sandbox.rocky.tf.core.network import MLP
 from sandbox.rocky.tf.envs.base import TfEnv
-from sandbox.rocky.tf.policies.categorical_mlp_policy import CategoricalMLPPolicy
+from sandbox.rocky.tf.policies.gaussian_mlp_policy import GaussianMLPPolicy
 
 from rllab.misc.instrument import run_experiment_lite
 from rllab.misc import logger
@@ -41,40 +42,66 @@ parser.add_argument('--value_function', help='Choose value function baseline',
                     default='adam')
 
 parser.add_argument('--n_parallel', type=int, default=int(16))
-parser.add_argument('--env', help='environment ID', default='MontezumaRevengeNoFrameskip-v4')
-parser.add_argument('--max_path_length', type=int, default=int(4500))
-parser.add_argument('--n_itr', type=int, default=int(500))
-parser.add_argument('--reward_no_scale', help='Turn off reward scaling', action='store_true')
-parser.add_argument('--atari_noop', action='store_true')
-parser.add_argument('--atari_eplife', action='store_true')
-parser.add_argument('--atari_firereset', action='store_true')
-parser.add_argument('--resize_size', type=int, default=int(52))
-parser.add_argument('--batch_size', type=int, default=int(100000))
+parser.add_argument('--env', help='environment', choices=['SwimmerGather', 'SparseHalfCheetah'],
+                    default='SwimmerGather')
+parser.add_argument('--max_path_length', type=int, default=int(500))
+parser.add_argument('--n_itr', type=int, default=int(2000))
+parser.add_argument('--batch_size', type=int, default=int(50000))
 parser.add_argument('--step_size', type=float, default=float(0.01))
 parser.add_argument('--discount_factor', type=float, default=float(0.995))
+parser.add_argument('--omit_normalizing_env', action='store_true')
 
 parser.add_argument('--embedding_dim', type=int, default=int(2))
 parser.add_argument('--embedding_opt_max_itr', type=int, default=int(3))
-parser.add_argument('--actions_unit_gaussian_kl_minimization_loss_weight', type=float, default=5e-1)
+parser.add_argument('--actions_unit_gaussian_kl_minimization_loss_weight', type=float, default=1e-1)
 parser.add_argument('--replay_pool_size', type=int, default=0)
-parser.add_argument('--replay_pool_strategy', type=str, default='subsampled_batch')
+parser.add_argument('--replay_pool_strategy', type=str, default='fifo')
 parser.add_argument('--residual_method', type=str, default='euclidean')
 
-parser.add_argument('--reconciler_loss_weight', type=float, default=1e2)
+parser.add_argument('--reconciler_loss_weight', type=float, default=1e4)
 
-parser.add_argument('--residual_ir_coeff', type=float, default=1e-3)
+parser.add_argument('--diversity_ir_coeff', type=float, default=1e-1)
+parser.add_argument('--diversity_kernel_bandwidth', type=float, default=5.0)
+parser.add_argument('--diversity_seeking_pool', type=str, default='replay_pool')
+
+parser.add_argument('--residual_ir_coeff', type=float, default=None)
 parser.add_argument('--residual_error_ir_normalize', action='store_true')
 parser.add_argument('--residual_error_ir_calc_after_opt', action='store_true')
 parser.add_argument('--residual_error_ir_use_unnormalized_errors', action='store_true')
 
-parser.add_argument('--mutualinfo_action_loss_weight', type=float, default=1e-1)
-parser.add_argument('--mutualinfo_obs_loss_weight', type=float, default=1e-1)
+parser.add_argument('--mutualinfo_action_loss_weight', type=float, default=5e-2)
+parser.add_argument('--mutualinfo_obs_loss_weight', type=float, default=5e-2)
 
 parser.add_argument('--embedding_adam_learning_rate', type=float, default=float(1e-3))
+
+parser.add_argument('--nonlinearity_for_trpo',
+                    help='Choose the nonlinearity for all hidden layers in value and policy networks',
+                    choices=['relu', 'tanh'],
+                    default='tanh')
+parser.add_argument('--nonlinearity_for_embedding',
+                    help='Choose the nonlinearity for all hidden layers in all embedding-related networks',
+                    choices=['relu', 'tanh'],
+                    default='relu')
 
 parser.add_argument('--test_trpo_only', action='store_true')
 
 args = parser.parse_args()
+
+
+def get_nonlinearity_for_trpo():
+	if args.nonlinearity_for_trpo == 'relu':
+		return tf.nn.relu
+	if args.nonlinearity_for_trpo == 'tanh':
+		return tf.nn.tanh
+	assert False
+
+
+def get_nonlinearity_for_embedding():
+	if args.nonlinearity_for_embedding == 'relu':
+		return tf.nn.relu
+	if args.nonlinearity_for_embedding == 'tanh':
+		return tf.nn.tanh
+	assert False
 
 
 def get_value_network(env):
@@ -96,8 +123,8 @@ def get_policy_network(env):
 		input_shape=env.observation_space.shape,
 		output_dim=env.action_space.flat_dim,
 		hidden_sizes=(64, 32),
-		hidden_nonlinearity=tf.nn.relu,
-		output_nonlinearity=tf.nn.softmax,
+		hidden_nonlinearity=get_nonlinearity_for_trpo(),
+		output_nonlinearity=None,
 		batch_normalization=False,
 	)
 	return policy_network
@@ -105,10 +132,10 @@ def get_policy_network(env):
 
 def get_policy(env):
 	policy_network = get_policy_network(env)
-	policy = CategoricalMLPPolicy(
+	policy = GaussianMLPPolicy(
 		name='policy',
 		env_spec=env.spec,
-		prob_network=policy_network
+		mean_network=policy_network
 	)
 	return policy
 
@@ -116,6 +143,8 @@ def get_policy(env):
 def get_baseline(env, value_function, num_slices):
 	if (value_function == 'zero'):
 		baseline = ZeroBaseline(env.spec)
+	elif (value_function == 'linear'):
+		baseline = LinearFeatureBaseline(env.spec)
 	else:
 		value_network = get_value_network(env)
 
@@ -155,7 +184,7 @@ def get_state_embedding_network_args(env, embedding_dim):
 		input_shape=env.observation_space.shape,
 		output_dim=embedding_dim,
 		hidden_sizes=(64, 32),
-		hidden_nonlinearity=tf.nn.relu,
+		hidden_nonlinearity=get_nonlinearity_for_embedding(),
 		output_nonlinearity=None,
 		batch_normalization=False,
 	)
@@ -168,7 +197,7 @@ def get_action_embedding_network_args(env, embedding_dim):
 		input_shape=(env.action_space.flat_dim,),
 		output_dim=embedding_dim,
 		hidden_sizes=(64,),
-		hidden_nonlinearity=tf.nn.relu,
+		hidden_nonlinearity=get_nonlinearity_for_embedding(),
 		output_nonlinearity=None,
 		batch_normalization=False,
 	)
@@ -181,7 +210,7 @@ def get_reconciler_common_network_args(env, embedding_dim):
 		output_dim=embedding_dim,
 		# hidden_sizes=(64,),
 		hidden_sizes=(256,),
-		hidden_nonlinearity=tf.nn.relu,
+		hidden_nonlinearity=get_nonlinearity_for_embedding(),
 		# hidden_nonlinearity=tf.nn.tanh,
 		output_nonlinearity=None,
 		batch_normalization=False,
@@ -195,7 +224,7 @@ def get_reconciler_state_network_args(env, embedding_dim):
 		# input_shape=env.observation_space.shape,
 		output_dim=None,
 		hidden_sizes=(64, 32),
-		hidden_nonlinearity=tf.nn.relu,
+		hidden_nonlinearity=get_nonlinearity_for_embedding(),
 		output_nonlinearity=None,
 		batch_normalization=False,
 	)
@@ -209,7 +238,7 @@ def get_reconciler_action_network_args(env, embedding_dim):
 		output_dim=env.spec.action_space.flat_dim,
 		# hidden_sizes=(256,),
 		hidden_sizes=(),
-		hidden_nonlinearity=tf.nn.relu,
+		hidden_nonlinearity=get_nonlinearity_for_embedding(),
 		output_nonlinearity=None,
 		batch_normalization=False,
 	)
@@ -222,7 +251,7 @@ def get_mutualinfo_action_network_args(env, embedding_dim):
 		input_shape=(embedding_dim,),
 		output_dim=1,
 		hidden_sizes=(64, 64),
-		hidden_nonlinearity=tf.nn.relu,
+		hidden_nonlinearity=get_nonlinearity_for_embedding(),
 		output_nonlinearity=None,
 		batch_normalization=False,
 	)
@@ -235,7 +264,7 @@ def get_mutualinfo_obs_network_args(env, embedding_dim):
 		input_shape=(embedding_dim,),
 		output_dim=1,
 		hidden_sizes=(64, 64),
-		hidden_nonlinearity=tf.nn.relu,
+		hidden_nonlinearity=get_nonlinearity_for_embedding(),
 		output_nonlinearity=None,
 		batch_normalization=False,
 	)
@@ -254,11 +283,19 @@ def main(_):
 
 	check_environment()
 
-	env = TfEnv(Grid_World_Env(
-		args.env, force_reset=True, record_video=False, record_log=False, resize_size=args.resize_size,
-		atari_noop=args.atari_noop, atari_eplife=args.atari_eplife, atari_firereset=args.atari_firereset,
-		save_original_frames=False,
-	))
+	if args.env == 'SwimmerGather':
+		from rllab.envs.mujoco.gather.swimmer_gather_env import SwimmerGatherEnv
+		env = SwimmerGatherEnv()
+	elif args.env == 'SparseHalfCheetah':
+		from rllab.envs.mujoco.sparse_half_cheetah_env import SparseHalfCheetahEnv
+		env = SparseHalfCheetahEnv()
+	else:
+		assert False
+
+	if not args.omit_normalizing_env:
+		env = normalize(env)
+
+	env = TfEnv(env)
 
 	policy = get_policy(env)
 	baseline = get_baseline(env, args.value_function, args.num_slices)
@@ -274,7 +311,7 @@ def main(_):
 	)
 
 	embeding_optimizer = FirstOrderOptimizer
-	embeding_optimizer_args = dict(max_epochs=args.embedding_opt_max_itr, batch_size=2048, num_slices=1,
+	embeding_optimizer_args = dict(max_epochs=args.embedding_opt_max_itr, batch_size=512, num_slices=1,
 	                               ignore_last=True, learning_rate=args.embedding_adam_learning_rate,
 	                               verbose=True)
 
@@ -350,6 +387,11 @@ def main(_):
 
 		reconciler_loss_weight=args.reconciler_loss_weight,
 
+		diversity_seeking_ir_weight=args.diversity_ir_coeff,
+		diversity_seeking_kernel_bandwidth=args.diversity_kernel_bandwidth,
+		diversity_seeking_calc='relative',
+		diversity_seeking_pool=args.diversity_seeking_pool,
+
 		residual_error_ir_weight=args.residual_ir_coeff,
 		residual_error_ir_normalize=args.residual_error_ir_normalize,
 		residual_error_ir_calc_after_opt=args.residual_error_ir_calc_after_opt,
@@ -374,7 +416,7 @@ def main(_):
 		n_itr=args.n_itr,
 		discount=args.discount_factor,
 		step_size=args.step_size,
-		clip_reward=(not args.reward_no_scale),
+		clip_reward=False,
 		optimizer_args={"subsample_factor": 1.0,
 		                "num_slices": args.num_slices},
 		dsae=dsae,

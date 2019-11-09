@@ -39,15 +39,11 @@ parser.add_argument('--log_dir', help='log directory', default=None)
 parser.add_argument('--value_function', help='Choose value function baseline',
                     choices=['zero', 'conj', 'adam', 'linear'],
                     default='adam')
-
 parser.add_argument('--n_parallel', type=int, default=int(16))
 parser.add_argument('--env', help='environment ID', default='MontezumaRevengeNoFrameskip-v4')
 parser.add_argument('--max_path_length', type=int, default=int(4500))
 parser.add_argument('--n_itr', type=int, default=int(500))
 parser.add_argument('--reward_no_scale', help='Turn off reward scaling', action='store_true')
-parser.add_argument('--atari_noop', action='store_true')
-parser.add_argument('--atari_eplife', action='store_true')
-parser.add_argument('--atari_firereset', action='store_true')
 parser.add_argument('--resize_size', type=int, default=int(52))
 parser.add_argument('--batch_size', type=int, default=int(100000))
 parser.add_argument('--step_size', type=float, default=float(0.01))
@@ -73,6 +69,65 @@ parser.add_argument('--mutualinfo_obs_loss_weight', type=float, default=1e-1)
 parser.add_argument('--embedding_adam_learning_rate', type=float, default=float(1e-3))
 
 parser.add_argument('--test_trpo_only', action='store_true')
+
+parser.add_argument('--env_type',
+					help='type of environment, used when the environment type cannot be automatically determined',
+					type=str)
+parser.add_argument('--alg', help='Algorithm', type=str, default='ppo2')
+parser.add_argument('--num_timesteps', type=float, default=1e6),
+parser.add_argument('--network', help='network type (mlp, cnn, lstm, cnn_lstm, conv_only)', default=None)
+parser.add_argument('--gamestate', help='game state to load (so far only used in retro games)', default=None)
+parser.add_argument('--num_env',
+					help='Number of environment copies being run in parallel. When not specified, set to number of cpus for Atari, and to 1 for Mujoco',
+					default=1, type=int)
+parser.add_argument('--reward_scale', help='Reward scale factor. Default: 1.0', default=1.0, type=float)
+parser.add_argument('--save_path', help='Path to save trained model to',
+					default='../../results/PPO/try_1/Random_start/', type=str)
+parser.add_argument('--save_video_interval', help='Save video every x steps (0 = disabled)', default=0, type=int)
+parser.add_argument('--save_video_length', help='Length of recorded video. Default: 200', default=200, type=int)
+parser.add_argument('--play', default=False, action='store_true')
+parser.add_argument('--nsteps', default=2048, type=int)
+parser.add_argument('--size', default=30, type=int)
+parser.add_argument('--n_action', default=4, type=int)
+parser.add_argument('--n_agent', default=2, type=int)
+parser.add_argument('--episode_length', default=300, type=int)
+parser.add_argument('--doi', default=8, type=int, help='door_open_interval')
+parser.add_argument('--penalty', default=0.0, type=float)
+parser.add_argument('--gamma_dec', default=0.0, type=float)
+parser.add_argument('--gamma_cen', default=0.0, type=float)
+parser.add_argument('--fix_start', default=False, action='store_true')
+parser.add_argument('--gamma_coor_r', default=0.0, type=float)
+parser.add_argument('--gamma_coor_t', default=0.0, type=float)
+parser.add_argument('--gamma_coor_tv', default=0.0, type=float)
+parser.add_argument('--symmetry', default=False, action='store_true')
+parser.add_argument('--simple_env', default=False, action='store_true')
+parser.add_argument('--r', default=False, action='store_true')
+parser.add_argument('--t', default=False, action='store_true')
+parser.add_argument('--tv', default=False, action='store_true')
+parser.add_argument('--r_tv', default=False, action='store_true')
+parser.add_argument('--env_n_dim', default=2, type=int)
+parser.add_argument('--t_save_rate', default=1, type=int)
+parser.add_argument('--s_data_gather', default=False, action='store_true')
+parser.add_argument('--s_data_path', default='/data1/wjh/code/results/data/', type=str)
+parser.add_argument('--s_try_num', default=0, type=int)
+parser.add_argument('--s_alg_name', default='', type=str)
+parser.add_argument('--s_load_num', default='', type=str)
+parser.add_argument('--island_partial_obs', default=False, action='store_true')
+parser.add_argument('--island_agent_max_power', default=11, type=int)
+parser.add_argument('--island_wolf_max_power', default=9, type=int)
+parser.add_argument('--island_wolf_recover_time', default=5, type=int)
+parser.add_argument('--i_num_landmark', default=2, type=int)
+# parser.add_argument('--x_island_agent_max_power', default=11, type=int)
+# parser.add_argument('--x_island_wolf_max_power', default=10, type=int)
+parser.add_argument('--x_island_agent_max_power', default=51, type=int)
+parser.add_argument('--x_island_wolf_max_power', default=21, type=int)
+parser.add_argument('--x_island_wolf_recover_time', default=5, type=int)
+parser.add_argument('--x_island_harm_range', default=11, type=int)
+parser.add_argument('--x_num_landmark', default=2, type=int)
+parser.add_argument('--x_wolf_rew', default=600, type=int)
+parser.add_argument('--x_landmark_rew', default=10, type=int)
+parser.add_argument('--not_view_landmark', default=False, action='store_true')
+parser.add_argument('--appro_T', default=0.5, type=float)
 
 args = parser.parse_args()
 
@@ -254,11 +309,7 @@ def main(_):
 
 	check_environment()
 
-	env = TfEnv(Grid_World_Env(
-		args.env, force_reset=True, record_video=False, record_log=False, resize_size=args.resize_size,
-		atari_noop=args.atari_noop, atari_eplife=args.atari_eplife, atari_firereset=args.atari_firereset,
-		save_original_frames=False,
-	))
+	env = TfEnv(Grid_World_Env(args.env))
 
 	policy = get_policy(env)
 	baseline = get_baseline(env, args.value_function, args.num_slices)
