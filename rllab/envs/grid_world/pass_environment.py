@@ -1,8 +1,8 @@
-import gym
 import matplotlib.pyplot as plt
 import numpy as np
-from Curiosity import Key_points
 import copy
+from rllab.spaces import Discrete
+from rllab.spaces import Box
 
 
 class Pass:
@@ -15,7 +15,7 @@ class Pass:
         size = 1
         for item in shape:
             size *= item
-        return gym.spaces.Discrete(size)
+        return Discrete(size)
 
     def get_action_n(self, action_n):
         res = []
@@ -60,7 +60,7 @@ class Pass:
         # Used by OpenAI baselines
         self.action_space_x = [self.n_action, self.n_action]
         self.action_space = self.get_discrete(self.action_space_x)
-        self.observation_space = gym.spaces.Box(low=-1, high=1, shape=[args.size * 4])
+        self.observation_space = Box(low=-1, high=1, shape=[args.size * 4])
         self.num_envs = args.num_env
         self.metadata = {'render.modes': []}
         self.reward_range = (-100., 2000.)
