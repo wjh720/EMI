@@ -23,7 +23,7 @@ from rllab.envs.grid_world.x_island_environment import x_Island
 from rllab.envs.atari.atari_wrappers import wrap_deepmind, make_atari, get_wrapper_of_specific_type, FrameSaver
 
 
-def get_venv(args, env_id, num_env, seed):
+def get_venv(args):
 	env_type = args.env
 	if env_type == 'pass':
 		env = make_multi_pass_env(env_id, env_type, num_env, seed, args)
@@ -39,50 +39,19 @@ def get_venv(args, env_id, num_env, seed):
 
 class Grid_World_Env(Env, Serializable):
 
-	
-	def __init__(self, env_name):
-		if log_dir is None:
-			if logger.get_snapshot_dir() is None:
-				logger.log("Warning: skipping Gym environment monitoring since snapshot_dir not configured.")
-			else:
-				log_dir = os.path.join(logger.get_snapshot_dir(), "gym_log")
+	def __init__(self, args):
+
 		Serializable.quick_init(self, locals())
 
-		env = make_atari(env_name, noop=atari_noop)
-
-		env = wrap_deepmind(env=env, resize=resize_size, episode_life=atari_eplife, fire_reset=atari_firereset,
-		                    save_original_frames=save_original_frames)
-		logger.log("resize size: %d" % resize_size)
-
-		self.save_original_frames = save_original_frames
-
+		env = get_venv(args)
 		self.env = env
 		self.env_id = env.spec.id
-
-		if self.save_original_frames:
-			self.original_frame_saver = get_wrapper_of_specific_type(env, FrameSaver)
-			assert self.original_frame_saver is not None
-
-		assert not (not record_log and record_video)
-
-		if log_dir is None or record_log is False:
-			self.monitoring = False
-		else:
-			if not record_video:
-				video_schedule = NoVideoSchedule()
-			else:
-				if video_schedule is None:
-					video_schedule = CappedCubicVideoSchedule()
-			self.env = gym.wrappers.Monitor(self.env, log_dir, video_callable=video_schedule, force=True)
-			self.monitoring = True
 
 		self._observation_space = convert_gym_space(env.observation_space)
 		logger.log("observation space: {}".format(self._observation_space))
 		self._action_space = convert_gym_space(env.action_space)
 		logger.log("action space: {}".format(self._action_space))
 		self._horizon = env.spec.tags['wrapper_config.TimeLimit.max_episode_steps']
-		self._log_dir = log_dir
-		self._force_reset = force_reset
 
 	@property
 	def observation_space(self):

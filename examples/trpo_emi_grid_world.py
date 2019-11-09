@@ -311,7 +311,7 @@ def main(_):
 
 	check_environment()
 
-	env = TfEnv(Grid_World_Env(args.env))
+	env = TfEnv(Grid_World_Env(args))
 
 	policy = get_policy(env)
 	baseline = get_baseline(env, args.value_function, args.num_slices)
