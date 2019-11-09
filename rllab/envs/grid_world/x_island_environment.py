@@ -1,7 +1,6 @@
+import gym
 import numpy as np
 import copy
-from rllab.spaces import Discrete
-from rllab.spaces import Box
 import random
 
 
@@ -16,7 +15,7 @@ class x_Island:
 		size = 1
 		for item in shape:
 			size *= item
-		return Discrete(size)
+		return gym.spaces.Discrete(size)
 
 	def get_action_n(self, action_n):
 		res = []
@@ -119,7 +118,7 @@ class x_Island:
 		# Used by OpenAI baselines
 		self.action_space_x = [self.n_action, self.n_action, self.n_action, self.n_action]
 		self.action_space = self.get_discrete(self.action_space_x)
-		self.observation_space = Box(low=-1, high=1,
+		self.observation_space = gym.spaces.Box(low=-1, high=1,
 		                                        shape=[(args.size * 2 + self.agent_max_power) * self.n_agent +
 		                                               (args.size * 2) * self.n_wolf +
 		                                               self.n_landmark * int(self.is_view_landmark) +
