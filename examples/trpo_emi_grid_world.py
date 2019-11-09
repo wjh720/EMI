@@ -423,7 +423,7 @@ def main(_):
 		n_itr=args.n_itr,
 		discount=args.discount_factor,
 		step_size=args.step_size,
-		clip_reward=(not args.reward_no_scale),
+		clip_reward=False,
 		optimizer_args={"subsample_factor": 1.0,
 		                "num_slices": args.num_slices},
 		dsae=dsae,
