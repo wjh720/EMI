@@ -39,32 +39,30 @@ parser.add_argument('--log_dir', help='log directory', default=None)
 parser.add_argument('--value_function', help='Choose value function baseline',
                     choices=['zero', 'conj', 'adam', 'linear'],
                     default='adam')
-parser.add_argument('--n_parallel', type=int, default=int(16))
+parser.add_argument('--n_parallel', type=int, default=int(32))
 parser.add_argument('--env', help='environment ID', default='MontezumaRevengeNoFrameskip-v4')
-parser.add_argument('--max_path_length', type=int, default=int(4500))
-parser.add_argument('--n_itr', type=int, default=int(500))
-parser.add_argument('--reward_no_scale', help='Turn off reward scaling', action='store_true')
-parser.add_argument('--resize_size', type=int, default=int(52))
-parser.add_argument('--batch_size', type=int, default=int(100000))
+parser.add_argument('--max_path_length', type=int, default=int(500))
+parser.add_argument('--n_itr', type=int, default=int(2000))
+parser.add_argument('--batch_size', type=int, default=int(50000))
 parser.add_argument('--step_size', type=float, default=float(0.01))
 parser.add_argument('--discount_factor', type=float, default=float(0.995))
 
 parser.add_argument('--embedding_dim', type=int, default=int(2))
 parser.add_argument('--embedding_opt_max_itr', type=int, default=int(3))
-parser.add_argument('--actions_unit_gaussian_kl_minimization_loss_weight', type=float, default=5e-1)
+parser.add_argument('--actions_unit_gaussian_kl_minimization_loss_weight', type=float, default=1e-1)
 parser.add_argument('--replay_pool_size', type=int, default=0)
 parser.add_argument('--replay_pool_strategy', type=str, default='subsampled_batch')
 parser.add_argument('--residual_method', type=str, default='euclidean')
 
-parser.add_argument('--reconciler_loss_weight', type=float, default=1e2)
+parser.add_argument('--reconciler_loss_weight', type=float, default=1e4)
 
 parser.add_argument('--residual_ir_coeff', type=float, default=1e-3)
 parser.add_argument('--residual_error_ir_normalize', action='store_true')
 parser.add_argument('--residual_error_ir_calc_after_opt', action='store_true')
 parser.add_argument('--residual_error_ir_use_unnormalized_errors', action='store_true')
 
-parser.add_argument('--mutualinfo_action_loss_weight', type=float, default=1e-1)
-parser.add_argument('--mutualinfo_obs_loss_weight', type=float, default=1e-1)
+parser.add_argument('--mutualinfo_action_loss_weight', type=float, default=5e-2)
+parser.add_argument('--mutualinfo_obs_loss_weight', type=float, default=5e-2)
 
 parser.add_argument('--embedding_adam_learning_rate', type=float, default=float(1e-3))
 
