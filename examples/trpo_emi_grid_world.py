@@ -42,8 +42,8 @@ parser.add_argument('--value_function', help='Choose value function baseline',
 parser.add_argument('--n_parallel', type=int, default=int(32))
 parser.add_argument('--env', help='environment ID', default='MontezumaRevengeNoFrameskip-v4')
 parser.add_argument('--max_path_length', type=int, default=int(300))
-parser.add_argument('--n_itr', type=int, default=int(6000))
-parser.add_argument('--batch_size', type=int, default=int(100000))
+parser.add_argument('--n_itr', type=int, default=int(9200))
+parser.add_argument('--batch_size', type=int, default=int(65536))
 parser.add_argument('--step_size', type=float, default=float(0.01))
 parser.add_argument('--discount_factor', type=float, default=float(0.995))
 
@@ -179,8 +179,8 @@ def get_baseline(env, value_function, num_slices):
 			)
 		elif (value_function == 'adam'):
 			baseline_optimizer = FirstOrderOptimizer(
-				max_epochs=5,
-				batch_size=64,
+				max_epochs=3,
+				batch_size=512,
 				num_slices=num_slices,
 				ignore_last=True,
 				# verbose=True
@@ -323,7 +323,7 @@ def main(_):
 	)
 
 	embeding_optimizer = FirstOrderOptimizer
-	embeding_optimizer_args = dict(max_epochs=args.embedding_opt_max_itr, batch_size=2048, num_slices=1,
+	embeding_optimizer_args = dict(max_epochs=args.embedding_opt_max_itr, batch_size=512, num_slices=1,
 	                               ignore_last=True, learning_rate=args.embedding_adam_learning_rate,
 	                               verbose=True)
 
