@@ -75,7 +75,7 @@ class ThreePass:
         self.num_envs = args.num_env
         self.metadata = {'render.modes': []}
         self.reward_range = (-100., 2000.)
-        self.spec = 2
+        self.spec = {'length': self.args.episode_length}
 
         self.t_step = 0
 
