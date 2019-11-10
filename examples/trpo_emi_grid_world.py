@@ -42,7 +42,7 @@ parser.add_argument('--value_function', help='Choose value function baseline',
 parser.add_argument('--n_parallel', type=int, default=int(32))
 parser.add_argument('--env', help='environment ID', default='MontezumaRevengeNoFrameskip-v4')
 parser.add_argument('--max_path_length', type=int, default=int(300))
-parser.add_argument('--n_itr', type=int, default=int(2000))
+parser.add_argument('--n_itr', type=int, default=int(6000))
 parser.add_argument('--batch_size', type=int, default=int(100000))
 parser.add_argument('--step_size', type=float, default=float(0.01))
 parser.add_argument('--discount_factor', type=float, default=float(0.995))
