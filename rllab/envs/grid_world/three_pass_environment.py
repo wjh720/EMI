@@ -10,6 +10,19 @@ class ThreePass:
         self.rank = rank
         self.initialization(args)
 
+    def get_discrete(self, shape):
+        size = 1
+        for item in shape:
+            size *= item
+        return gym.spaces.Discrete(size)
+
+    def get_action_n(self, action_n):
+        res = []
+        for item in self.action_space_x:
+            res.append(action_n % item)
+            action_n /= item
+        return res
+
     def initialization(self, args):
         self.is_print = self.rank == 0
 
@@ -56,7 +69,8 @@ class ThreePass:
         self.flag = np.eye(2)
 
         # Used by OpenAI baselines
-        self.action_space = gym.spaces.MultiDiscrete([self.n_action, self.n_action])
+        self.action_space_x = [self.n_action, self.n_action]
+        self.action_space = self.get_discrete(self.action_space_x)
         self.observation_space = gym.spaces.Box(low=-1, high=1, shape=[args.size * 4])
         self.num_envs = args.num_env
         self.metadata = {'render.modes': []}
@@ -66,6 +80,8 @@ class ThreePass:
         self.t_step = 0
 
     def step(self, action_n, obs_a=False, obs_b=False, obs_c=False, obs_d=False):
+
+        action_n = self.get_action_n(action_n)
 
         self.t_step += 1
         for i, action in enumerate(action_n):
