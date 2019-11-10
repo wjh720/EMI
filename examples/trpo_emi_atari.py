@@ -32,7 +32,7 @@ import tensorflow as tf
 
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('--seed', help='RNG seed', type=int, default=2)
-parser.add_argument('--n_cpu', type=int, default=int(8))
+parser.add_argument('--n_cpu', type=int, default=int(16))
 parser.add_argument('--num_slices', help='Slice big batch into smaller ones to prevent OOM', type=int,
                     default=int(16))
 parser.add_argument('--debug', help='debug mode', action='store_true')
