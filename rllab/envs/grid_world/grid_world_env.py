@@ -16,6 +16,7 @@ from rllab.spaces.product import Product
 from rllab.misc import logger
 
 from rllab.envs.grid_world.pass_environment import Pass
+from rllab.envs.grid_world.three_pass_environment import ThreePass
 from rllab.envs.grid_world.island_environment import Island
 from rllab.envs.grid_world.pushball_environment import PushBall
 from rllab.envs.grid_world.x_island_environment import x_Island
@@ -27,6 +28,8 @@ def get_venv(args):
 	env_type = args.env
 	if env_type == 'pass':
 		env = Pass(args, 0)
+	elif env_type == 'threepass':
+		env = ThreePass(args, 0)
 	elif env_type == 'island':
 		env = Island(args, 0)
 	elif env_type == 'x_island':
