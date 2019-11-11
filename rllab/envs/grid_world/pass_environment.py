@@ -123,7 +123,14 @@ class Pass:
 
         info = {'door': self.door_open, 'state': copy.deepcopy(self.state_n)}
 
-        return self.obs_n()[0], self.reward()[0], self.done(), info
+        return_obs = self.obs_n()
+        return_rew = self.reward()
+        return_done = self.done()
+
+        if return_done and return_rew[0] > 0 and random.randint(0, 1000) == 0:
+            print(info['state'])
+
+        return return_obs[0], return_rew[0], return_done, info
 
     def fix_reset(self):
         self.t_step = 0
