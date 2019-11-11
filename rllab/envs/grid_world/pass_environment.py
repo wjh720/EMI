@@ -122,7 +122,7 @@ class Pass:
 		self.map[int(self.size * 0.2), int(self.size * 0.8)] = 1
 
 		self.landmarks = [np.array([int(self.size * 0.8), int(self.size * 0.2)]),
-		                  np.array([int(self.size * 0.2), int(self.size * 0.8)])]
+						  np.array([int(self.size * 0.2), int(self.size * 0.8)])]
 
 		self.door_open_interval = args.doi
 		self.door_open = False
@@ -311,7 +311,7 @@ class Pass:
 			same_room = 1
 
 		return np.concatenate([self.eye[self.state_n[0][0]], self.eye[self.state_n[0][1]],
-		                       self.eye[self.state_n[1][0]], self.eye[self.state_n[1][1]]]).copy()
+							   self.eye[self.state_n[1][0]], self.eye[self.state_n[1][1]]]).copy()
 
 	# self.flag[same_room],
 	# self.flag[int(self.door_open)]]).copy()]
