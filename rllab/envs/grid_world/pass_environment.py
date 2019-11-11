@@ -94,6 +94,9 @@ class Pass:
             elif action == 3:
                 new_row = self.state_n[i][0]
                 new_column = max(self.state_n[i][1] - 1, 0)
+            else:
+                print(action_n)
+                assert(True)
 
             if self.map[new_row][new_column] != -1:
                 self.state_n[i] = np.array([new_row, new_column])
