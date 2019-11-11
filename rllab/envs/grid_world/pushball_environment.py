@@ -123,8 +123,11 @@ class PushBall:
 
 			for j, ball in enumerate(self.ball_n):
 				if (self.state_n[i] != ball).any() and new_row == ball[0] and new_column == ball[1]:
-					assert (action < 5)
-					ball_count[j][action] += 1
+					try:
+						assert (action < 5)
+						ball_count[j][action] += 1
+					except:
+						print(j, action_n, action)
 
 		new_ball_n = []
 		# Move Ball
