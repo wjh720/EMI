@@ -39,7 +39,7 @@ parser.add_argument('--log_dir', help='log directory', default=None)
 parser.add_argument('--value_function', help='Choose value function baseline',
                     choices=['zero', 'conj', 'adam', 'linear'],
                     default='adam')
-parser.add_argument('--n_parallel', type=int, default=int(32))
+parser.add_argument('--n_parallel', type=int, default=int(16))
 parser.add_argument('--env', help='environment ID', default='MontezumaRevengeNoFrameskip-v4')
 parser.add_argument('--max_path_length', type=int, default=int(300))
 parser.add_argument('--n_itr', type=int, default=int(9200))
