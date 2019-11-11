@@ -53,8 +53,8 @@ parser.add_argument('--actions_unit_gaussian_kl_minimization_loss_weight', type=
 parser.add_argument('--replay_pool_size', type=int, default=0)
 parser.add_argument('--replay_pool_strategy', type=str, default='fifo')
 parser.add_argument('--residual_method', type=str, default='euclidean')
-'''
-parser.add_argument('--reconciler_loss_weight', type=float, default=1e2)
+
+parser.add_argument('--reconciler_loss_weight', type=float, default=1e4)
 
 parser.add_argument('--residual_ir_coeff', type=float, default=1e-3)
 parser.add_argument('--residual_error_ir_normalize', action='store_true')
@@ -82,22 +82,22 @@ parser.add_argument('--mutualinfo_action_loss_weight', type=float, default=5e-2)
 parser.add_argument('--mutualinfo_obs_loss_weight', type=float, default=5e-2)
 
 parser.add_argument('--embedding_adam_learning_rate', type=float, default=float(1e-3))
-
+'''
 parser.add_argument('--test_trpo_only', action='store_true')
 
 parser.add_argument('--env_type',
-					help='type of environment, used when the environment type cannot be automatically determined',
-					type=str)
+                    help='type of environment, used when the environment type cannot be automatically determined',
+                    type=str)
 parser.add_argument('--alg', help='Algorithm', type=str, default='ppo2')
 parser.add_argument('--num_timesteps', type=float, default=1e6),
 parser.add_argument('--network', help='network type (mlp, cnn, lstm, cnn_lstm, conv_only)', default=None)
 parser.add_argument('--gamestate', help='game state to load (so far only used in retro games)', default=None)
 parser.add_argument('--num_env',
-					help='Number of environment copies being run in parallel. When not specified, set to number of cpus for Atari, and to 1 for Mujoco',
-					default=1, type=int)
+                    help='Number of environment copies being run in parallel. When not specified, set to number of cpus for Atari, and to 1 for Mujoco',
+                    default=1, type=int)
 parser.add_argument('--reward_scale', help='Reward scale factor. Default: 1.0', default=1.0, type=float)
 parser.add_argument('--save_path', help='Path to save trained model to',
-					default='../../results/PPO/try_1/Random_start/', type=str)
+                    default='../../results/PPO/try_1/Random_start/', type=str)
 parser.add_argument('--save_video_interval', help='Save video every x steps (0 = disabled)', default=0, type=int)
 parser.add_argument('--save_video_length', help='Length of recorded video. Default: 200', default=200, type=int)
 parser.add_argument('--play', default=False, action='store_true')
@@ -415,11 +415,6 @@ def main(_):
 		actions_unit_gaussian_kl_minimization_loss_weight=args.actions_unit_gaussian_kl_minimization_loss_weight,
 
 		reconciler_loss_weight=args.reconciler_loss_weight,
-
-		diversity_seeking_ir_weight=args.diversity_ir_coeff,
-		diversity_seeking_kernel_bandwidth=args.diversity_kernel_bandwidth,
-		diversity_seeking_calc='relative',
-		diversity_seeking_pool=args.diversity_seeking_pool,
 
 		residual_error_ir_weight=args.residual_ir_coeff,
 		residual_error_ir_normalize=args.residual_error_ir_normalize,
