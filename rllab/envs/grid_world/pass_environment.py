@@ -131,9 +131,6 @@ class Pass:
         return_rew = self.reward()
         return_done = self.done()
 
-        if return_done:
-            print(info['state'])
-
         return return_obs[0], return_rew[0], return_done, info
 
     def fix_reset(self):
