@@ -53,7 +53,7 @@ parser.add_argument('--actions_unit_gaussian_kl_minimization_loss_weight', type=
 parser.add_argument('--replay_pool_size', type=int, default=0)
 parser.add_argument('--replay_pool_strategy', type=str, default='fifo')
 parser.add_argument('--residual_method', type=str, default='euclidean')
-'''
+
 parser.add_argument('--reconciler_loss_weight', type=float, default=1e2)
 
 parser.add_argument('--residual_ir_coeff', type=float, default=1e-3)
@@ -82,7 +82,7 @@ parser.add_argument('--mutualinfo_action_loss_weight', type=float, default=5e-2)
 parser.add_argument('--mutualinfo_obs_loss_weight', type=float, default=5e-2)
 
 parser.add_argument('--embedding_adam_learning_rate', type=float, default=float(1e-3))
-
+'''
 parser.add_argument('--test_trpo_only', action='store_true')
 
 parser.add_argument('--env_type',
@@ -415,11 +415,6 @@ def main(_):
 		actions_unit_gaussian_kl_minimization_loss_weight=args.actions_unit_gaussian_kl_minimization_loss_weight,
 
 		reconciler_loss_weight=args.reconciler_loss_weight,
-
-		diversity_seeking_ir_weight=args.diversity_ir_coeff,
-		diversity_seeking_kernel_bandwidth=args.diversity_kernel_bandwidth,
-		diversity_seeking_calc='relative',
-		diversity_seeking_pool=args.diversity_seeking_pool,
 
 		residual_error_ir_weight=args.residual_ir_coeff,
 		residual_error_ir_normalize=args.residual_error_ir_normalize,
