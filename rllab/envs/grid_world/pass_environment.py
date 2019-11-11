@@ -128,7 +128,7 @@ class Pass:
         return_rew = self.reward()
         return_done = self.done()
 
-        if return_done and return_rew[0] > 0 and random.randint(0, 1000) == 0:
+        if return_done:
             print(info['state'])
 
         return return_obs[0], return_rew[0], return_done, info
