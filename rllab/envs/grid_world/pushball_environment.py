@@ -128,6 +128,7 @@ class PushBall:
 						ball_count[j][action] += 1
 					except:
 						print(j, action_n, action)
+						assert(True)
 
 		new_ball_n = []
 		# Move Ball
