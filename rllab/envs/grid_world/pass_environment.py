@@ -18,6 +18,7 @@ class Pass:
         return gym.spaces.Discrete(size)
 
     def get_action_n(self, action_n):
+        action_n = int(action_n)
         res = []
         for item in self.action_space_x:
             res.append(action_n % item)
