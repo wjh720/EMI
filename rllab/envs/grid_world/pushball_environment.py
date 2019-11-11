@@ -23,7 +23,7 @@ class PushBall:
 		res = []
 		for item in self.action_space_x:
 			res.append(action_n % item)
-			action_n /= item
+			action_n //= item
 		return res
 
 	def random_start(self):
