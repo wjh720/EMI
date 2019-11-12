@@ -123,7 +123,11 @@ class Pass:
 		self.t_step = 0
 
 		# Visualization
-		self.heat_map = Visualization(self.args.size, self.args.n_agent, self.args)
+		self.is_print = random.randint(0, 16) == 0
+		if self.is_print:
+			self.e_step = 0
+			self.hot_map_save_path = self.args.save_path
+			self.heat_map = Visualization(self.args.size, self.args.n_agent, self.args)
 
 	def step(self, action_n, obs_a=False, obs_b=False, obs_c=False, obs_d=False):
 
@@ -182,6 +186,13 @@ class Pass:
 		return_obs = self.obs_n()
 		return_rew = self.reward()
 		return_done = self.done()
+
+		if self.is_print:
+			self.heat_map.update(info['state'], info['door'])
+			if return_done:
+				self.e_step += 1
+				if (self.e_step + 1) % 1000 == 0:
+					self.heat_map.show(self.hot_map_save_path, self.e_step + 1)
 
 		return return_obs[0], return_rew[0], return_done, info
 
