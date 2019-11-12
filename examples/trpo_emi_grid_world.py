@@ -1,6 +1,7 @@
 import argparse
 import os
 import sys
+import shutil
 
 sys.path.append(os.path.join(os.path.abspath(os.path.dirname(__file__)), '..'))
 
@@ -318,7 +319,15 @@ def check_environment():
 		raise Exception('Please use TensorFlow {}'.format(required_tf_version))
 
 
+def mkdir(path):
+	if os.path.exists(path):
+		shutil.rmtree(path)
+	os.makedirs(path)
+
+
 def main(_):
+	mkdir(args.save_path)
+
 	logger.log(str(args))
 	logger.log('Main process id: {}'.format(os.getpid()))
 
