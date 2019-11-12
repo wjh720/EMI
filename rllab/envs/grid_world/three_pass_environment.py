@@ -75,6 +75,10 @@ class ThreePass:
 		return res
 
 	def initialization(self, args):
+
+		self.seed = random.randint(0, 9999)
+		np.random.seed(self.seed)
+		
 		self.is_print = self.rank == 0
 
 		self.args = args
