@@ -191,7 +191,7 @@ class Pass:
 			self.heat_map.update(info['state'], info['door'])
 			if return_done:
 				self.e_step += 1
-				if (self.e_step + 1) % 1000 == 0:
+				if (self.e_step + 1) % 100 == 0:
 					self.heat_map.show(self.hot_map_save_path, self.e_step + 1)
 
 		return return_obs[0], return_rew[0], return_done, info
