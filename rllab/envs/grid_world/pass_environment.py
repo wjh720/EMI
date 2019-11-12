@@ -54,6 +54,7 @@ class Visualization:
 
 		self.visited_old = [v.copy() for v in self.visited]
 
+
 class Pass:
 	def __init__(self, args, rank):
 		self.args = args
