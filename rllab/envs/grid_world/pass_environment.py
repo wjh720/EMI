@@ -5,80 +5,54 @@ import copy
 import random
 
 
-class Dec:
+class Visualization:
+
 	def __init__(self, size, n_agent, args):
-		self.env_n_dim = args.env_n_dim
 		self.size = size
 		self.n_agent = n_agent
 		self.args = args
 		self.visited = [np.zeros([args.size, args.size, 2]) for _ in range(self.n_agent)]
 		self.visited_old = [np.zeros([args.size, args.size, 2]) for _ in range(self.n_agent)]
 
-		if self.env_n_dim == 1:
-			self.show_visited = np.zeros([args.size, args.size])
-			self.show_visited_old = np.zeros([args.size, args.size])
-
 	def update(self, state, is_door_open):
 		# For heat map
 		for i in range(self.n_agent):
 			self.visited[i][state[i][0]][state[i][1]][int(is_door_open)] += 1
 
-		if self.env_n_dim == 1:
-			self.show_visited[state[0][0]][state[1][0]] += 1
-
-	def output(self, state, i):
-		return 1. / np.sqrt(np.sum(self.visited[i][state[i][0]][state[i][1]]) + 1)
-
 	def show(self, path, e):
-		if self.env_n_dim == 2:
-			figure = plt.figure(figsize=(16, 10))
+		figure = plt.figure(figsize=(16, 10))
 
-			ax1 = figure.add_subplot(2, 6, 1)
-			ax2 = figure.add_subplot(2, 6, 2)
-			ax3 = figure.add_subplot(2, 6, 3)
-			ax4 = figure.add_subplot(2, 6, 4)
-			ax5 = figure.add_subplot(2, 6, 5)
-			ax6 = figure.add_subplot(2, 6, 6)
-			ax7 = figure.add_subplot(2, 6, 7)
-			ax8 = figure.add_subplot(2, 6, 8)
-			ax9 = figure.add_subplot(2, 6, 9)
-			ax10 = figure.add_subplot(2, 6, 10)
-			ax11 = figure.add_subplot(2, 6, 11)
-			ax12 = figure.add_subplot(2, 6, 12)
+		ax1 = figure.add_subplot(2, 6, 1)
+		ax2 = figure.add_subplot(2, 6, 2)
+		ax3 = figure.add_subplot(2, 6, 3)
+		ax4 = figure.add_subplot(2, 6, 4)
+		ax5 = figure.add_subplot(2, 6, 5)
+		ax6 = figure.add_subplot(2, 6, 6)
+		ax7 = figure.add_subplot(2, 6, 7)
+		ax8 = figure.add_subplot(2, 6, 8)
+		ax9 = figure.add_subplot(2, 6, 9)
+		ax10 = figure.add_subplot(2, 6, 10)
+		ax11 = figure.add_subplot(2, 6, 11)
+		ax12 = figure.add_subplot(2, 6, 12)
 
-			ax1.imshow(np.log(self.visited[0][:, :, 0] + 1))
-			ax2.imshow(np.log(self.visited[0][:, :, 0] - self.visited_old[0][:, :, 0] + 1))
-			ax3.imshow(np.log(self.visited[0][:, :, 1] + 1))
-			ax4.imshow(np.log((self.visited[0][:, :, 1] - self.visited_old[0][:, :, 1] + 1)))
-			ax5.imshow(np.log(np.sum(self.visited[0], axis=2) + 1))
-			ax6.imshow(np.log(np.sum(self.visited[0], axis=2) - np.sum(self.visited_old[0], axis=2) + 1))
+		ax1.imshow(np.log(self.visited[0][:, :, 0] + 1))
+		ax2.imshow(np.log(self.visited[0][:, :, 0] - self.visited_old[0][:, :, 0] + 1))
+		ax3.imshow(np.log(self.visited[0][:, :, 1] + 1))
+		ax4.imshow(np.log((self.visited[0][:, :, 1] - self.visited_old[0][:, :, 1] + 1)))
+		ax5.imshow(np.log(np.sum(self.visited[0], axis=2) + 1))
+		ax6.imshow(np.log(np.sum(self.visited[0], axis=2) - np.sum(self.visited_old[0], axis=2) + 1))
 
-			ax7.imshow(np.log(self.visited[1][:, :, 0] + 1))
-			ax8.imshow(np.log(self.visited[1][:, :, 0] - self.visited_old[1][:, :, 0] + 1))
-			ax9.imshow(np.log(self.visited[1][:, :, 1] + 1))
-			ax10.imshow(np.log((self.visited[1][:, :, 1] - self.visited_old[1][:, :, 1] + 1)))
-			ax11.imshow(np.log(np.sum(self.visited[1], axis=2) + 1))
-			ax12.imshow(np.log(np.sum(self.visited[1], axis=2) - np.sum(self.visited_old[1], axis=2) + 1))
+		ax7.imshow(np.log(self.visited[1][:, :, 0] + 1))
+		ax8.imshow(np.log(self.visited[1][:, :, 0] - self.visited_old[1][:, :, 0] + 1))
+		ax9.imshow(np.log(self.visited[1][:, :, 1] + 1))
+		ax10.imshow(np.log((self.visited[1][:, :, 1] - self.visited_old[1][:, :, 1] + 1)))
+		ax11.imshow(np.log(np.sum(self.visited[1], axis=2) + 1))
+		ax12.imshow(np.log(np.sum(self.visited[1], axis=2) - np.sum(self.visited_old[1], axis=2) + 1))
 
-			figure.savefig('%s/%i.png' % (path, e))
-			plt.close(figure)
+		figure.savefig('%s/%i.png' % (path, e))
+		plt.close(figure)
 
-			self.visited_old = [v.copy() for v in self.visited]
-		elif self.env_n_dim == 1:
-			figure = plt.figure(figsize=(16, 10))
-
-			ax1 = figure.add_subplot(2, 1, 1)
-			ax2 = figure.add_subplot(2, 1, 2)
-
-			ax1.imshow(np.log(self.show_visited + 1))
-			ax2.imshow(np.log(self.show_visited - self.show_visited_old + 1))
-
-			figure.savefig('%s/%i.png' % (path, e))
-			plt.close(figure)
-
-			self.visited_old = [v.copy() for v in self.visited]
-			self.show_visited_old = self.show_visited.copy()
-
+		self.visited_old = [v.copy() for v in self.visited]
 
 class Pass:
 	def __init__(self, args, rank):
@@ -147,6 +121,9 @@ class Pass:
 		self.spec = {'length': self.args.episode_length}
 
 		self.t_step = 0
+
+		# Visualization
+		self.heat_map = Visualization(self.args.size, self.args.n_agent, self.args)
 
 	def step(self, action_n, obs_a=False, obs_b=False, obs_c=False, obs_d=False):
 
